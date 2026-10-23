@@ -7,8 +7,9 @@ A responsive personal pay ledger with a Supabase database and authentication, sh
 - Supabase project `prid-pay` is provisioned in the selected organization, in us-east-1.
 - Its public schema and access policies are applied. Security advisors report no findings.
 - The web app, calculation tests and Excel importer are implemented.
-- A private Sites preview is supplied for review. It is owner-only at the hosting layer, so the manager cannot use that preview link. The app's shared access will be usable on the requested Vercel deployment.
-- Vercel project creation is blocked by the connected account's missing permission for scope `masiddiqui`. The app has not been deployed to Vercel.
+- A private Sites preview is supplied for review. It is owner-only at the hosting layer, so the manager cannot use that preview link. Use the Vercel production URL for the app's shared access.
+- Production is deployed at https://prid-pay.vercel.app/ in the Vercel account `masiddiqui`, linked to `Masiddiquit/prid-pay` on `main`.
+- Supabase Site URL and the exact redirect allowlist are configured for the production domain.
 - Source code is maintained in the private GitHub repository `Masiddiquit/prid-pay`.
 
 No original workbook or financial transaction data is included in these sources. The sample dashboard uses invented records and never writes them to the database.
@@ -20,7 +21,7 @@ No original workbook or financial transaction data is included in these sources.
 3. In Settings, choose Import Excel. Select the original workbook and explicitly choose its year. Review the preview, then import.
 4. Open each month and confirm receipts, actual payment dates and payment methods. Requests such as “Need for home” remain pending. Imported pending items do not affect the app's balance until confirmed.
 5. In My bank, set the first month's opening balance. Add daily bank transactions and actual closing balances. Add pay deposits only when they actually reached the bank.
-6. When the Vercel deployment is available, enter the manager's verified email in Settings. Share the app link with them yourself; no invitation email is sent by this app.
+6. Enter the manager's verified email in Settings. Share the app link with them yourself; no invitation email is sent by this app.
 
 ## Pay calculations
 
@@ -67,12 +68,12 @@ Use a static development server, e.g. `python3 -m http.server 8080 --directory d
 
 `database/schema.sql` is the consolidated schema for a fresh Supabase project. Do not re-run it on the already provisioned project. `database/hardening.sql` records the applied hardening change and is not needed after installing the consolidated schema. `database/verify-access.sql` runs reversible synthetic fixtures inside a transaction and rolls everything back. It verifies owner access, shared pay editing, bank isolation, outsider denial, import and duplicate import rejection. The check assumes its fixed fixture IDs are not already in use.
 
-Eight calculation tests cover signed balances, pending and planned records, year transitions, opening overrides, bank reconciliation, import staging and CSV formula-injection escaping. Browser checks covered sample dashboard, pay deduction, and bank expense flows. Final email onboarding and the manager's real account still need to be exercised by the account holders.
+Eight calculation tests cover signed balances, pending and planned records, year transitions, opening overrides, bank reconciliation, import staging and CSV formula-injection escaping. Browser checks covered sample dashboard, pay deduction, and bank expense flows. The production URL was verified to return HTTP 200 without Vercel login, serve the configured security headers, and render the sample dashboard. Final email onboarding and the manager's real account still need to be exercised by the account holders.
 
 ## GitHub and Vercel handoff
 
-The private GitHub repository is `Masiddiquit/prid-pay`. The original workbook must not be committed. Import the repository in Vercel under the intended account/team after granting its connection the required team access. Framework preset: Other; output directory: `dist`; build and install commands: leave empty. `vercel.json` contains the hosting settings and security headers. No secret server credentials are needed.
+The private GitHub repository is `Masiddiquit/prid-pay`. The original workbook must not be committed. The repository is imported into the Vercel project `prid-pay` under `masiddiqui`; pushes to `main` trigger production deployments. Framework preset: Other; output directory: `dist`; build and install commands: leave empty. `vercel.json` contains the hosting settings and security headers. No secret server credentials are needed.
 
-In Supabase Authentication → URL Configuration, set the Site URL to the deployed HTTPS app URL and add the app origin to the redirect allowlist. This enables direct email confirmation and password-reset redirects. The app also accepts the email verification/reset link through its verification form, so onboarding does not rely solely on the redirect. Configure production email delivery as needed in Supabase before inviting additional accounts.
+Supabase Authentication → URL Configuration is set to `https://prid-pay.vercel.app` with `https://prid-pay.vercel.app/` in the redirect allowlist. This enables direct email confirmation and password-reset redirects. The app also accepts the email verification/reset link through its verification form, so onboarding does not rely solely on the redirect. Configure production email delivery as needed in Supabase before inviting additional accounts.
 
 To use another Supabase project, apply the consolidated schema once and replace `dist/config.js` with that project's URL and publishable key. Never put a secret key or service-role key there.
