@@ -27,3 +27,10 @@ export function csv(rows){return rows.map(row=>row.map(v=>{let s=String(v??'');i
 export const escapeHtml=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
 export const uuid=()=> typeof crypto.randomUUID==='function'?crypto.randomUUID():'10000000-1000-4000-8000-100000000000'.replace(/[018]/g,c=>(Number(c)^(crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> Number(c)/4)).toString(16));
+
+export function yearlySummary(periods,entries,opening=0){
+ const calculated=payroll(periods,entries,opening),years=[...new Set(calculated.map(p=>p.year))].sort((a,b)=>a-b);
+ return years.map(year=>{const all=calculated.filter(p=>p.year===year),active=all.filter(p=>p.status!=='planned'),sum=k=>active.reduce((n,p)=>n+Number(p[k]||0),0);
+  return {year,earned:sum('earned'),payments:sum('payments'),deductions:sum('deductions'),base:sum('base_pay_cents'),additions:sum('additions'),opening:active[0]?.opening??null,closing:active.at(-1)?.closing??null,active:active.length,planned:all.length-active.length,pending:all.reduce((n,p)=>n+p.pending,0)};
+ });
+}

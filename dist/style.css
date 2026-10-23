@@ -7,3 +7,5 @@
 .year-select{width:auto}
 
 .source-table{max-height:55vh;overflow:auto}.source-table td{white-space:normal;overflow-wrap:anywhere}.source-table th{position:sticky;top:0;background:var(--paper,#fff)}
+
+.money-chart{overflow-x:auto;padding:12px 20px 0}.money-chart svg{display:block;width:100%;max-height:310px}.chart-tick{fill:#788477;font-size:11px;font-family:inherit}

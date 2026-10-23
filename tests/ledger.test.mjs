@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {payroll,bankSummary,cents,csv,periodDates} from '../dist/logic.js';
+import {payroll,yearlySummary,bankSummary,cents,csv,periodDates} from '../dist/logic.js';
 import {prepareImport,dateFromNote} from '../dist/import.js';
 const period=(id,year,month,extra={})=>({id,year,month,base_pay_cents:250000,...extra});
 const entry=(period_id,kind,amount_cents,status='confirmed')=>({period_id,kind,amount_cents,status});
@@ -59,4 +59,13 @@ test('invalid years and duplicate month tabs fail before import',()=>{
  assert.throws(()=>prepareImport([],2026.5));
  const s={name:'Jan',cells:{A1:{value:'Pay'},B1:{value:'2500'}}};
  assert.throws(()=>prepareImport([s,s],2026),/duplicate/);
+});
+
+test('all-years totals include running years, keep future years and do not sum carried balances',()=>{
+ const ps=[period('a',2026,10,{status:'open'}),period('b',2027,1,{status:'review'}),period('c',2028,1,{status:'planned'})];
+ const es=[entry('a','payment',100000),entry('b','deduction',10000),entry('b','payment',50000,'pending')];
+ const y=yearlySummary(ps,es);assert.deepEqual(y.map(x=>x.year),[2026,2027,2028]);
+ assert.equal(y[0].earned,250000);assert.equal(y[0].closing,150000);
+ assert.equal(y[1].opening,150000);assert.equal(y[1].closing,390000);assert.equal(y[1].pending,1);
+ assert.equal(y[2].earned,0);assert.equal(y[2].planned,1);assert.equal(y[2].closing,null);
 });

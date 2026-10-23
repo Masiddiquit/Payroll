@@ -5,7 +5,7 @@ A responsive personal pay ledger with a Supabase database and authentication, sh
 ## Current status
 
 - Supabase project `prid-pay` is provisioned in the selected organization, in us-east-1.
-- Its public schema and access policies are applied. Security advisors report no findings.
+- Its public schema and access policies are applied. Row-level access checks pass. The Auth advisor flags leaked-password protection as disabled; review that optional setting before wider rollout.
 - The web app, calculation tests and Excel importer are implemented.
 - A private Sites preview is supplied for review. It is owner-only at the hosting layer, so the manager cannot use that preview link. Use the Vercel production URL for the app's shared access.
 - Production is deployed at https://prid-pay.vercel.app/ in the Vercel account `masiddiqui`, linked to `Masiddiquit/prid-pay` on `main`.
@@ -39,9 +39,13 @@ Pay-period reports group receipts by the period they settle. The Reports page se
 
 The browser reads ZIP/XML from the workbook using vendored fflate 0.8.2, with compressed and expanded size limits. No workbook is uploaded to a public server. Only the explicitly confirmed import payload is saved to the authenticated ledger via the `import_pay_year` transaction.
 
-The importer recognizes the uploaded PRID tab layout, not arbitrary spreadsheets. It preserves additions, deductions, previous balances, source cell references, notes and original Excel closing totals. All receipt rows are pending. Negative receipt amounts become pending positive balance reversals. Check the signed adjustment before confirming. The original workbook's blank previous-month cells become explicit zero overrides, matching Excel; clear an override to enable automatic carry.
+The importer recognizes the uploaded PRID tab layout, not arbitrary spreadsheets. It preserves additions, deductions, previous balances, source cell references, notes and original Excel closing totals. Explicit day/month notes are retained as dates. Clearly labelled, dated cash and Zelle receipts are confirmed; undated receipts, requests and ambiguous notes remain pending. Original populated cells, formulas and notes are preserved in each month’s Original worksheet view and CSV export. Negative receipt amounts become pending positive balance reversals. Check the signed adjustment before confirming. The original workbook's blank previous-month cells become explicit zero overrides, matching Excel; clear an override to enable automatic carry.
 
-The importer was checked against the supplied workbook: all 12 source closing totals and all 12 recalculated closing totals matched exactly when staged receipts were included. It staged 70 entries, 21 of which need receipt/adjustment review. An import is atomic and cannot overwrite a year already containing periods.
+The importer was checked against the supplied workbook: all 12 source closing totals and all 12 recalculated closing totals matched exactly when staged receipts were included. It staged 70 entries, 12 of which need receipt/adjustment review. An import is atomic and cannot overwrite a year already containing periods.
+
+## Yearly dashboard
+
+Choose All years on Overview to compare every recorded year, including the current running year. Add month accepts years 2000–2100, including 2027 and 2028. Each saved year appears automatically. Planned months remain visible but are excluded from earned pay and carry calculations. Open a year to see its monthly graph. The latest carried balance is shown once, never summed across years.
 
 ## Bank tracking
 
@@ -68,7 +72,7 @@ Use a static development server, e.g. `python3 -m http.server 8080 --directory d
 
 `database/schema.sql` is the consolidated schema for a fresh Supabase project. Do not re-run it on the already provisioned project. `database/hardening.sql` records the applied hardening change and is not needed after installing the consolidated schema. `database/verify-access.sql` runs reversible synthetic fixtures inside a transaction and rolls everything back. It verifies owner access, shared pay editing, bank isolation, outsider denial, import and duplicate import rejection. The check assumes its fixed fixture IDs are not already in use.
 
-Eight calculation tests cover signed balances, pending and planned records, year transitions, opening overrides, bank reconciliation, import staging and CSV formula-injection escaping. Browser checks covered sample dashboard, pay deduction, and bank expense flows. The production URL was verified to return HTTP 200 without Vercel login, serve the configured security headers, and render the sample dashboard. Final email onboarding and the manager's real account still need to be exercised by the account holders.
+Twelve calculation and import tests cover signed balances, pending and planned records, year transitions, opening overrides, bank reconciliation, import staging and CSV formula-injection escaping. Browser checks covered sample dashboard, pay deduction, and bank expense flows. Production sign-in and the actual workbook import have also been exercised. The production URL was verified to return HTTP 200 without Vercel login, serve the configured security headers, and render the sample dashboard. The owner account is confirmed and production sign-in works. Manager isolation was verified with rollback-only database fixtures; a real manager sign-in, password reset email and physical printing were not exercised.
 
 ## GitHub and Vercel handoff
 
