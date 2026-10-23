@@ -15,7 +15,7 @@ create table public.pay_periods (
  year integer not null check(year between 2000 and 2100), month integer not null check(month between 1 and 12),
  start_date date not null, end_date date not null, base_pay_cents bigint not null default 250000 check(base_pay_cents>=0),
  opening_override_cents bigint, status text not null default 'open' check(status in ('open','review','closed','planned')),
- notes text not null default '', source_total_cents bigint, updated_at timestamptz not null default now(), updated_by uuid default auth.uid(),
+ notes text not null default '', source_total_cents bigint, source_sheet jsonb, updated_at timestamptz not null default now(), updated_by uuid default auth.uid(),
  unique(ledger_id,year,month), unique(id,ledger_id), check(start_date<=end_date)
 );
 create index pay_periods_ledger_idx on public.pay_periods(ledger_id,start_date);
@@ -63,9 +63,9 @@ create function public.import_pay_year(p_ledger uuid,p_year integer,p_periods js
 begin
  if not exists(select 1 from public.pay_ledgers where id=p_ledger and owner_id=auth.uid()) then raise exception 'Only the ledger owner can import';end if;
  if exists(select 1 from public.pay_periods where ledger_id=p_ledger and year=p_year) then raise exception 'This year already has periods. Import into an empty year.';end if;
- insert into public.pay_periods(id,ledger_id,year,month,start_date,end_date,base_pay_cents,opening_override_cents,status,notes,source_total_cents)
- select x.id,p_ledger,p_year,x.month,x.start_date,x.end_date,x.base_pay_cents,x.opening_override_cents,x.status,x.notes,x.source_total_cents
- from jsonb_to_recordset(p_periods) as x(id uuid,month integer,start_date date,end_date date,base_pay_cents bigint,opening_override_cents bigint,status text,notes text,source_total_cents bigint);
+ insert into public.pay_periods(id,ledger_id,year,month,start_date,end_date,base_pay_cents,opening_override_cents,status,notes,source_total_cents,source_sheet)
+ select x.id,p_ledger,p_year,x.month,x.start_date,x.end_date,x.base_pay_cents,x.opening_override_cents,x.status,x.notes,x.source_total_cents,x.source_sheet
+ from jsonb_to_recordset(p_periods) as x(id uuid,month integer,start_date date,end_date date,base_pay_cents bigint,opening_override_cents bigint,status text,notes text,source_total_cents bigint,source_sheet jsonb);
  insert into public.pay_entries(id,ledger_id,period_id,kind,description,amount_cents,entry_date,method,status,notes,source_ref)
  select x.id,p_ledger,x.period_id,x.kind,x.description,x.amount_cents,x.entry_date,x.method,x.status,x.notes,x.source_ref
  from jsonb_to_recordset(p_entries) as x(id uuid,period_id uuid,kind text,description text,amount_cents bigint,entry_date date,method text,status text,notes text,source_ref text);

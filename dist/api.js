@@ -13,7 +13,7 @@ export const api={
  async login(email,password){save(await request('/auth/v1/token?grant_type=password',{method:'POST',body:{email,password},token:false}));},
  async signup(email,password){const data=await request('/auth/v1/signup',{method:'POST',body:{email,password},token:false});if(data.access_token)save(data);return data;},
  async verify(email,input,type='signup'){let body={email,token:input,type};if(/^https:\/\//i.test(input)){const u=new URL(input);if(u.origin!==config.url)throw new Error('Use the verification link from your PRID Pay email.');const token_hash=u.searchParams.get('token_hash')||u.searchParams.get('token');if(!token_hash)throw new Error('The verification link is missing its token.');body={token_hash,type};}save(await request('/auth/v1/verify',{method:'POST',body,token:false}));},
- async logout(){try{await request('/auth/v1/logout',{method:'POST'})}finally{save(null)}},
+ async logout(){try{await request('/auth/v1/logout',{method:'POST'})}catch{/* Local sign-out must complete even when the network is unavailable. */}finally{save(null)}},
  async recover(email){return request('/auth/v1/recover',{method:'POST',body:{email},token:false})},
  async changePassword(password){return request('/auth/v1/user',{method:'PUT',body:{password}})},
  async acceptHash(){const p=new URLSearchParams(location.hash.slice(1));if(p.get('access_token')){const token=p.get('access_token');const user=await request('/auth/v1/user',{token:false,headers:{Authorization:'Bearer '+token}});save({access_token:token,refresh_token:p.get('refresh_token'),expires_in:Number(p.get('expires_in')||3600),user});history.replaceState(null,'',location.pathname);return p.get('type');}},
