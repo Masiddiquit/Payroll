@@ -24,8 +24,8 @@ test('Overview renders all months, one month, all years and dynamic category lab
  a.state.selected='jan';const monthly=a.periodView();assert.match(monthly,/Deductions/);assert.match(monthly,/Confirmed deductions from this month’s pay/);assert.match(monthly,/\$140\.00/);assert.match(monthly,/Carry forward/);a.state.dashboardMonth=2;html=a.overview();assert.match(html,/Opening carry[\s\S]*?\$2,360\.00/);
  a.state.overviewScope='all';html=a.overview();assert.match(html,/Books &amp; courses/);assert.match(html,/Year-by-year statement/);
 });
-test('navigation removes Reports and settings exposes guarded reset only for the owner',()=>{
- const {a,elements}=app();a.render();assert.doesNotMatch(elements.get('#app').innerHTML,/data-view="reports"/);assert.match(elements.get('#app').innerHTML,/aria-label="Workspace navigation"/);
+test('navigation keeps monthly workflow and settings exposes guarded reset only for the owner',()=>{
+ const {a,elements}=app();a.render();assert.doesNotMatch(elements.get('#app').innerHTML,/data-view="(?:reports|payments|bank)"/);assert.match(elements.get('#app').innerHTML,/aria-label="Workspace navigation"/);
  assert.match(a.settings(),/Delete all my data/);a.deleteAllData();assert.match(elements.get('#dialog-body').innerHTML,/Type DELETE ALL to confirm/);assert.match(elements.get('#dialog-body').innerHTML,/type="checkbox" name="acknowledge" required/);
  a.state.user.id='manager';assert.doesNotMatch(a.settings(),/data-action="delete-all"/);assert.throws(()=>a.deleteAllData(),/Only the owner/);
 });
