@@ -21,3 +21,13 @@
 .stats-five{grid-template-columns:repeat(5,minmax(0,1fr))}
 @media(max-width:1200px){.stats-five{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:800px){.stats-five{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* Five financial figures, with contained tables and consistent chart scales. */
+.stats-five{grid-template-columns:repeat(3,minmax(0,1fr))}.stats-five .stat-footer{line-height:1.5}
+.overview-analysis{display:grid;gap:24px}.overview-analysis>*,.detail-grid>*,.grid-main>*,.card{min-width:0}
+.metric-charts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px;padding:12px 24px 20px}
+.metric-chart{margin:0;min-width:0}.metric-chart figcaption{font-size:13px;font-weight:650;display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.metric-chart figcaption i{display:block;width:10px;height:10px;border-radius:3px}.metric-plot{overflow-x:auto}.metric-chart svg{width:100%;display:block;min-width:300px}.chart-note{padding:0 24px 22px;font-size:11px;line-height:1.6;color:var(--muted)}.monthly-charts{margin-bottom:24px}
+.faith-reminder{border-left:3px solid #b7c898;background:#eef2e7;border-radius:8px;padding:17px 21px;margin:0 0 24px;break-inside:avoid}.faith-reminder .arabic{font-family:'Noto Naskh Arabic','Traditional Arabic',Georgia,serif;font-size:24px;line-height:1.8;letter-spacing:0;text-align:right;color:var(--green)}.faith-reminder .meaning{font-size:12px;line-height:1.7;margin-top:8px}.faith-reminder .meaning span{font-weight:650}.faith-reminder a{display:inline-block;font-size:11px;margin-top:8px;line-height:1.6;text-underline-offset:3px}.faith-reminder.compact{padding:0;border:0;margin:0;background:transparent}.faith-reminder.compact .arabic{font-size:19px}.card>.faith-reminder{margin:0 23px 23px}.auth-story .faith-reminder{margin-top:25px;background:#285c4c;border:0}.auth-story .faith-reminder .arabic,.auth-story .faith-reminder .meaning,.auth-story .faith-reminder a{color:#f1f6e8}
+@media(max-width:800px){.stats-five{grid-template-columns:repeat(2,minmax(0,1fr))}.metric-charts{grid-template-columns:1fr}.pagehead{flex-wrap:wrap}.formgrid{grid-template-columns:1fr}}
+@media(max-width:480px){.metric-charts{padding:10px 14px;gap:20px}.metric-chart svg{min-width:260px}.faith-reminder{padding:14px}.faith-reminder .arabic{font-size:21px}.stats-five{grid-template-columns:1fr}.chart-note{padding:12px 14px}}
