@@ -33,7 +33,7 @@ A positive carry is owed to the employee. A negative carry is an advance against
 
 The calendar month in a pay-period label refers to the period's end. The default January period runs December 19–January 18. Actual start and end dates are editable, including the workbook's unusual January start on December 9.
 
-Pay-period reports group receipts by the period they settle. The Reports page separately shows receipts by their actual calendar-year payment dates.
+Pay-period reports group receipts by the period they settle. Overview also shows receipts by their actual calendar payment dates for the selected year and month.
 
 ## Excel import behavior
 
@@ -41,17 +41,27 @@ The browser reads ZIP/XML from the workbook using vendored fflate 0.8.2, with co
 
 The importer recognizes the uploaded PRID tab layout, not arbitrary spreadsheets. It preserves additions, deductions, previous balances, source cell references, notes and original Excel closing totals. Explicit day/month notes are retained as dates. Clearly labelled, dated cash and Zelle receipts are confirmed; undated receipts, requests and ambiguous notes remain pending. Original populated cells, formulas and notes are preserved in each month’s Original worksheet view and CSV export. Negative receipt amounts become pending positive balance reversals. Check the signed adjustment before confirming. The original workbook's blank previous-month cells become explicit zero overrides, matching Excel; clear an override to enable automatic carry.
 
-The importer was checked against the supplied workbook: all 12 source closing totals and all 12 recalculated closing totals matched exactly when staged receipts were included. It staged 70 entries, 12 of which need receipt/adjustment review. An import is atomic and cannot overwrite a year already containing periods.
+The importer was checked against the supplied workbook: all 12 source closing totals and all 12 recalculated closing totals matched exactly when staged receipts were included. It staged 70 entries, 6 of which still need receipt/adjustment review after the revised workbook was applied. An import is atomic and cannot overwrite a year already containing periods.
 
 ## Yearly dashboard
 
-Choose All years on Overview to compare every recorded year, including the current running year. Add month accepts years 2000–2100, including 2027 and 2028. Each saved year appears automatically. Planned months remain visible but are excluded from earned pay and carry calculations. Open a year to see its monthly graph. The latest carried balance is shown once, never summed across years.
+Overview has Year and Month selectors. Choose All months or any January–December month; totals, category spending, the statement and CSV follow the selection. Choose All years to compare every recorded year, including the current running year. Add month accepts years 2000–2100, including 2027 and 2028. Each saved year appears automatically. Planned months remain visible but are excluded from earned pay and carry calculations. Open a year to see its monthly graph. The latest carried balance is shown once, never summed across years.
 
 ## Bank tracking
 
 Bank data uses calendar months and is private to each authenticated user, including when payroll is shared. It is not an online banking connection. Opening bank balance + actual inflows − actual outflows gives calculated closing. Actual closing from the bank statement gives a reconciliation difference. An actual closing does not silently replace the calculated balance; correct missing transactions or explicitly reset the following opening when appropriate.
 
 Pay deductions do not automatically create bank withdrawals. Cash pay does not automatically create a bank deposit. A confirmed pay receipt may be explicitly linked to one bank deposit. Duplicate links are blocked. If a linked receipt is later changed or removed, review the bank transaction; the bank ledger represents actual bank activity and is kept separate.
+
+## Expense categories and data reset
+
+Pay entries and bank transactions accept an editable category with saved suggestions and new custom names. Overview groups confirmed pay deductions by allocated pay period, or private bank outflows by actual calendar date. These sources are displayed separately to prevent double-counting. Category graphs include every category present in the selected month or year; there is no fixed category list or top-eight cutoff.
+
+The Reports tab has been removed. Its reconciliation, statement, actual-date receipt total and CSV functions are in Overview.
+
+Settings includes a private full JSON backup and Delete all my data. The reset requires typing DELETE ALL and checking the acknowledgement. The SECURITY INVOKER RPC removes only the caller's bank records and owned pay ledgers (including their periods, entries, original worksheets and sharing configuration). It preserves their authentication account and other owners' ledgers. The JSON backup is a data copy; automated restore is not implemented.
+
+The sidebar has independent vertical scrolling and keyboard focus for short screens and browser zoom.
 
 ## Security and collaboration
 
@@ -72,7 +82,7 @@ Use a static development server, e.g. `python3 -m http.server 8080 --directory d
 
 `database/schema.sql` is the consolidated schema for a fresh Supabase project. Do not re-run it on the already provisioned project. `database/hardening.sql` records the applied hardening change and is not needed after installing the consolidated schema. `database/verify-access.sql` runs reversible synthetic fixtures inside a transaction and rolls everything back. It verifies owner access, shared pay editing, bank isolation, outsider denial, import and duplicate import rejection. The check assumes its fixed fixture IDs are not already in use.
 
-Twelve calculation and import tests cover signed balances, pending and planned records, year transitions, opening overrides, bank reconciliation, import staging and CSV formula-injection escaping. Browser checks covered sample dashboard, pay deduction, and bank expense flows. Production sign-in and the actual workbook import have also been exercised. The production URL was verified to return HTTP 200 without Vercel login, serve the configured security headers, and render the sample dashboard. The owner account is confirmed and production sign-in works. Manager isolation was verified with rollback-only database fixtures; a real manager sign-in, password reset email and physical printing were not exercised.
+Seventeen calculation, import and screen-rendering tests cover signed balances, pending and planned records, year transitions, opening overrides, bank reconciliation, import staging and CSV formula-injection escaping. Browser checks covered sample dashboard, pay deduction, and bank expense flows. Production sign-in and the actual workbook import have also been exercised. The production URL was verified to return HTTP 200 without Vercel login, serve the configured security headers, and render the sample dashboard. The owner account is confirmed and production sign-in works. Manager isolation was verified with rollback-only database fixtures; a real manager sign-in, password reset email and physical printing were not exercised.
 
 ## GitHub and Vercel handoff
 
