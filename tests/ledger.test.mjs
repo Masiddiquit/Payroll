@@ -69,3 +69,23 @@ test('all-years totals include running years, keep future years and do not sum c
  assert.equal(y[1].opening,150000);assert.equal(y[1].closing,390000);assert.equal(y[1].pending,1);
  assert.equal(y[2].earned,0);assert.equal(y[2].planned,1);assert.equal(y[2].closing,null);
 });
+
+test('month selection keeps carry from preceding months and filters categories dynamically',async()=>{
+ const {scopedPeriods,categoryTotals}=await import('../dist/logic.js');
+ const ps=[period('jan',2026,1,{status:'closed'}),period('feb',2026,2,{status:'open'}),period('planned',2026,3,{status:'planned'}),period('next',2027,1,{status:'open'})];
+ const make=(id,category,amount,status='confirmed')=>({...entry(id,'deduction',amount,status),category});
+ const es=[make('jan','Phone',100),make('jan','Housing',200),make('feb',' phone ',300),make('feb','Housing',400),make('feb','Books',500),make('feb','Health',600),make('feb','Pending category',900,'pending'),make('planned','Planned category',900),make('next','Other year',900)];
+ assert.equal(categoryTotals(es,{periods:ps,year:2026,month:1}).length,2);
+ const feb=categoryTotals(es,{periods:ps,year:2026,month:2});assert.equal(feb.length,4);assert.equal(feb.reduce((s,x)=>s+x.amount,0),1800);
+ const year=categoryTotals(es,{periods:ps,year:2026});assert.equal(year.length,4);assert.equal(year.find(x=>x.category==='Phone').amount,400);
+ const calc=payroll(ps,es);assert.equal(scopedPeriods(calc,2026,2)[0].opening,249700);
+ assert.equal(categoryTotals(es,{periods:ps}).length,5);
+});
+test('bank category graph uses calendar date, merges case and accepts new categories without a limit',async()=>{
+ const {categoryTotals}=await import('../dist/logic.js');
+ const es=[{entry_date:'2026-01-20',amount_cents:-100,category:'Food'},{entry_date:'2026-02-01',amount_cents:-200,category:' food '},{entry_date:'2026-02-01',amount_cents:500,category:'Income'},...Array.from({length:12},(_,i)=>({entry_date:'2026-02-02',amount_cents:-100,category:'Custom '+i}))];
+ assert.equal(categoryTotals(es,{source:'bank',year:2026,month:1}).length,1);
+ const feb=categoryTotals(es,{source:'bank',year:2026,month:2});assert.equal(feb.length,13);assert.equal(feb.reduce((s,x)=>s+x.amount,0),1400);
+ const year=categoryTotals(es,{source:'bank',year:2026});assert.equal(year.find(x=>x.category==='Food').amount,300);
+ assert.deepEqual(categoryTotals(es,{source:'bank',year:2027}),[]);
+});

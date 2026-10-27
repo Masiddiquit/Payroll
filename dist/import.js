@@ -1,5 +1,5 @@
 import {unzipSync,strFromU8} from './fflate.js';
-import {cents,periodDates,uuid} from './logic.js';
+import {cents,periodDates,uuid,suggestedCategory} from './logic.js';
 const xml=text=>{const doc=new DOMParser().parseFromString(text,'application/xml');if(doc.querySelector('parsererror'))throw new Error('This workbook contains invalid XML.');return doc;};
 export function readWorkbook(buffer){
  const data=new Uint8Array(buffer);if(data.length>10*1024*1024)throw new Error('Please upload an Excel file smaller than 10 MB.');
@@ -41,7 +41,7 @@ export function prepareImport(sheets,year){
   else if(kind!=='adjustment'&&amount<0)throw new Error(`Review the negative amount at ${sheet.name}!B${r}.`);
   const method=/zell(?:e|ed)/i.test(note(r))?'Zelle':/cash/i.test(note(r))?'Cash':originalKind==='payment'?'Other':'';
   if(kind==='payment'&&entry_date&&['Zelle','Cash'].includes(method)&&!/(need|request|expect|pending)/i.test(note(r)))status='confirmed';
-  entries.push({id:uuid(),period_id:id,kind,description,amount_cents:amount,entry_date,method,status,notes:note(r),source_ref:`${sheet.name}!B${r}`});
+  entries.push({id:uuid(),period_id:id,kind,description,category:suggestedCategory(description),amount_cents:amount,entry_date,method,status,notes:note(r),source_ref:`${sheet.name}!B${r}`});
  };
  for(let r=2;r<payRow;r++)if(num(r)!=null&&!c['B'+r]?.formula&&label(r))add(r,'deduction',label(r),num(r));
  for(let r=payRow+1;r<(remainingRow||lastRow);r++){

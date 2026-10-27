@@ -9,3 +9,11 @@
 .source-table{max-height:55vh;overflow:auto}.source-table td{white-space:normal;overflow-wrap:anywhere}.source-table th{position:sticky;top:0;background:var(--paper,#fff)}
 
 .money-chart{overflow-x:auto;padding:12px 20px 0}.money-chart svg{display:block;width:100%;max-height:310px}.chart-tick{fill:#788477;font-size:11px;font-family:inherit}
+
+/* The fixed navigation must scroll independently on short screens and at high zoom. */
+.sidebar{height:100vh;height:100dvh;overflow-y:auto;overflow-x:hidden;overscroll-behavior-y:contain;scrollbar-gutter:stable}
+.sidebar>*{flex-shrink:0}.sidebar .bottom{padding-top:12px}
+.filter-label{display:grid;gap:5px;font-size:11px;color:var(--muted)}
+.category-card{margin-top:24px;margin-bottom:24px}.category-bars{padding:8px 23px 22px;display:grid;gap:17px}.category-line{display:flex;justify-content:space-between;gap:16px;font-size:12px;overflow-wrap:anywhere}.category-line small{color:var(--muted);font-size:10px}.category-track{height:10px;background:#eff3e9;border-radius:6px;margin:8px 0 4px;overflow:hidden}.category-track span{display:block;height:100%;background:var(--green);border-radius:6px}.category-row>.sub{font-size:10px}.danger-zone{border-color:#e6c4be;grid-column:1/-1}.danger-zone h2{color:var(--red)}
+@media(max-width:800px){.sidebar .user{display:flex;justify-content:center;padding-top:12px}.sidebar .user .avatar,.sidebar .user strong{display:none}.sidebar .user div:nth-child(2){flex:none}.sidebar .signout{font-size:9px;white-space:normal}.category-card .cardhead{align-items:flex-start;flex-wrap:wrap}}
+@media(max-width:480px){.category-line{flex-wrap:wrap;gap:4px}.category-card .year-select{max-width:none}.category-card .tablefoot{gap:10px;flex-wrap:wrap}}

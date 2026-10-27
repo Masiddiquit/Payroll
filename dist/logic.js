@@ -34,3 +34,29 @@ export function yearlySummary(periods,entries,opening=0){
   return {year,earned:sum('earned'),payments:sum('payments'),deductions:sum('deductions'),base:sum('base_pay_cents'),additions:sum('additions'),opening:active[0]?.opening??null,closing:active.at(-1)?.closing??null,active:active.length,planned:all.length-active.length,pending:all.reduce((n,p)=>n+p.pending,0)};
  });
 }
+
+export function normalizeCategory(value){return String(value??'').normalize('NFKC').trim().replace(/\s+/g,' ')||'Other';}
+export function suggestedCategory(description){
+ const s=String(description||'').toLowerCase();
+ if(/t[ -]?mobile|mobile plan|new phone/.test(s))return 'Phone';
+ if(/home charges|\brent\b/.test(s))return 'Housing';
+ if(/sent home|need for home/.test(s))return 'Family support';
+ if(/transport|\btoll\b|petrol|fuel/.test(s))return 'Transport';
+ if(/shopping|dress/.test(s))return 'Shopping';
+ if(/subscription/.test(s))return 'Subscriptions';
+ if(/sevis|visa/.test(s))return 'Education & fees';
+ return 'Other';
+}
+export function scopedPeriods(periods,year,month=0){return periods.filter(p=>(year==null||p.year===Number(year))&&(!Number(month)||p.month===Number(month)));}
+export function categoryTotals(entries,{source='pay',periods=[],year=null,month=0}={}){
+ const ids=new Set(scopedPeriods(periods,year,month).filter(p=>p.status!=='planned').map(p=>p.id));
+ const groups=new Map();
+ for(const e of entries){
+  if(source==='pay'&&(e.kind!=='deduction'||e.status!=='confirmed'||!ids.has(e.period_id)))continue;
+  if(source==='bank'&&(!(Number(e.amount_cents)<0)||!e.entry_date||(year!=null&&Number(e.entry_date.slice(0,4))!==Number(year))||(Number(month)&&Number(e.entry_date.slice(5,7))!==Number(month))))continue;
+  const category=normalizeCategory(e.category||suggestedCategory(e.description)),key=category.toLocaleLowerCase('en-US'),amount=source==='bank'?-Number(e.amount_cents):Number(e.amount_cents);
+  if(!groups.has(key))groups.set(key,{category,amount:0,count:0});
+  const g=groups.get(key);g.amount+=amount;g.count++;
+ }
+ return [...groups.values()].sort((a,b)=>b.amount-a.amount||a.category.localeCompare(b.category));
+}
