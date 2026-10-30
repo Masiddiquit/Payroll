@@ -52,6 +52,6 @@ export function prepareImport(sheets,year){
  if(remainingRow)for(let r=remainingRow+1;r<=(totalRow||lastRow);r++)if(num(r)!=null&&!c['B'+r]?.formula)add(r,'payment',note(r)||label(r)||'Payment — details needed',num(r),'pending');
  }
  if(new Set(periods.map(p=>p.month)).size!==periods.length)throw new Error('The workbook has duplicate monthly tabs.');
- if(!periods.length)throw new Error('No PRID pay tabs found. Use tabs named Jan, Feb, Mar… with a Pay row.');
+ if(!periods.length)throw new Error('No monthly pay tabs found. Use tabs named Jan, Feb, Mar… with a Pay row.');
  return{periods,entries};
 }

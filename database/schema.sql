@@ -1,7 +1,7 @@
 begin;
 create table public.pay_ledgers (
  id uuid primary key default gen_random_uuid(), owner_id uuid not null default auth.uid() references auth.users(id),
- name text not null default 'PRID Pay', manager_email text, default_pay_cents bigint not null default 250000 check(default_pay_cents>=0),
+ name text not null default 'Payroll', manager_email text, default_pay_cents bigint not null default 250000 check(default_pay_cents>=0),
  opening_due_cents bigint not null default 0, created_at timestamptz not null default now()
 );
 create index pay_ledgers_owner_idx on public.pay_ledgers(owner_id);

@@ -1,3 +1,10 @@
+# Payroll rename — 2026-10-30
+
+- Renamed the app wordmark, browser title, favicon, default ledger label, exports, backup filenames, and session key to Payroll.
+- Updated current source and documentation to use the renamed repository and production address.
+- Existing 19 automated tests pass; JavaScript syntax checks pass.
+- Supabase project and ledger display names use Payroll. The default ledger name is Payroll. Financial amounts and access policies are unchanged.
+
 # Verification — 2026-10-27
 
 ## Current update
@@ -17,7 +24,7 @@
 
 ### 2026-10-23
 
-Deployment: https://prid-pay.vercel.app/
+Deployment: https://payroll-masiddiqui.vercel.app/
 
 ## Passed
 
@@ -41,4 +48,3 @@ Deployment: https://prid-pay.vercel.app/
 - A real manager-account sign-in, password-reset email delivery and physical printing were not exercised. Manager isolation was tested with transactional database fixtures.
 - Supabase Auth advisor reports leaked-password protection disabled. No sharing or authentication protections were weakened during testing.
 - Browser extension metadata errors were observed; no app error was seen in the tested flows.
-
