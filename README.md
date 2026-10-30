@@ -8,7 +8,7 @@ A responsive personal pay ledger with a Supabase database and authentication, sh
 - Its public schema and access policies are applied. Row-level access checks pass. The Auth advisor flags leaked-password protection as disabled; review that optional setting before wider rollout.
 - The web app, calculation tests and Excel importer are implemented.
 - A private Sites preview is supplied for review. It is owner-only at the hosting layer, so the manager cannot use that preview link. Use the Vercel production URL for the app's shared access.
-- Production is deployed at https://payroll-masiddiqui.vercel.app/ in the Vercel account `masiddiqui`, linked to `Masiddiquit/Payroll` on `main`.
+- Production is deployed at https://payroll-records.vercel.app/ in the Vercel account `masiddiqui`, linked to `Masiddiquit/Payroll` on `main`.
 - Supabase Site URL and the exact redirect allowlist are configured for the production domain.
 - Source code is maintained in the private GitHub repository `Masiddiquit/Payroll`.
 
@@ -81,6 +81,6 @@ Nineteen calculation, import and screen-rendering tests cover signed balances, p
 
 The private GitHub repository is `Masiddiquit/Payroll`. The original workbook must not be committed. The repository is imported into the Vercel project `payroll` under `masiddiqui`; pushes to `main` trigger production deployments. Framework preset: Other; output directory: `dist`; build and install commands: leave empty. `vercel.json` contains the hosting settings and security headers. No secret server credentials are needed.
 
-Supabase Authentication → URL Configuration is set to `https://payroll-masiddiqui.vercel.app` with `https://payroll-masiddiqui.vercel.app/` in the redirect allowlist. This enables direct email confirmation and password-reset redirects. The app also accepts the email verification/reset link through its verification form, so onboarding does not rely solely on the redirect. Configure production email delivery as needed in Supabase before inviting additional accounts.
+Supabase Authentication → URL Configuration is set to `https://payroll-records.vercel.app` with `https://payroll-records.vercel.app/` in the redirect allowlist. This enables direct email confirmation and password-reset redirects. The app also accepts the email verification/reset link through its verification form, so onboarding does not rely solely on the redirect. Configure production email delivery as needed in Supabase before inviting additional accounts.
 
 To use another Supabase project, apply the consolidated schema once and replace `dist/config.js` with that project's URL and publishable key. Never put a secret key or service-role key there.
